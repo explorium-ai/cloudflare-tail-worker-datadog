@@ -6,6 +6,8 @@ export interface Env {
 	SERVICE_NAME: "mcp-tail-worker";
 	/** Environment name for tagging logs (e.g., production, staging) */
 	ENVIRONMENT?: string;
+	/** Datadog site (e.g., datadoghq.com, datadoghq.eu, us3.datadoghq.com) */
+	DD_SITE?: string;
 }
 
 /**
@@ -121,9 +123,14 @@ export default {
 			// Transform events to Datadog format
 			const datadogLogs = transformToDatadogLogs(events, env);
 			
-			// Datadog logs intake URL (v2 API)
-			const datadogUrl = `https://http-intake.logs.datadoghq.com/api/v2/logs`;
+		    // Determine Datadog site - default to US1 (datadoghq.com)
+			const ddSite = env.DD_SITE || 'datadoghq.com';
+			
+			// Datadog logs intake URL (v2 API) - configurable by site
+			const datadogUrl = `https://http-intake.logs.${ddSite}/api/v2/logs`;
 
+
+			
 			// Send logs to Datadog
 			const response = await fetch(datadogUrl, {
 				method: 'POST',

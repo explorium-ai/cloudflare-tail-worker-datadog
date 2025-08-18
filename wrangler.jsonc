@@ -27,7 +27,8 @@
 	 */
 	"vars": {
 		"SERVICE_NAME": "mcp-tail-worker",
-		"ENVIRONMENT": "production"
+		"ENVIRONMENT": "production",
+		"DD_SITE": "datadoghq.com"
 	}
 	/**
 	 * Note: Use secrets to store sensitive data.
