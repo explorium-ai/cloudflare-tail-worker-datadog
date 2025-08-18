@@ -25,10 +25,7 @@ Set up the following secrets using Wrangler:
 
 ```bash
 # Required: Your Datadog API key
-wrangler secret put DATADOG_API_KEY
-
-# Optional: Datadog Application key (for some advanced features)
-wrangler secret put DATADOG_APP_KEY
+wrangler secret put DD_API_KEY
 ```
 
 ### 3. Configure Environment Variables

@@ -121,8 +121,8 @@ export default {
 			// Transform events to Datadog format
 			const datadogLogs = transformToDatadogLogs(events, env);
 			
-			// Datadog logs intake URL
-			const datadogUrl = `https://http-intake.logs.datadoghq.com/v1/input/${env.DD_API_KEY}`;
+			// Datadog logs intake URL (v2 API)
+			const datadogUrl = `https://http-intake.logs.datadoghq.com/api/v2/logs`;
 
 			// Send logs to Datadog
 			const response = await fetch(datadogUrl, {
