@@ -33,71 +33,31 @@ function transformToDatadogLogs(events: TraceItem[], env: Env): DatadogLogEntry[
 	const datadogLogs: DatadogLogEntry[] = [];
 
 	events.forEach(event => {
-		const baseTimestamp = new Date(event.eventTimestamp || Date.now()).getTime();
 		const baseTags = [
-			`service:${env.SERVICE_NAME}`,
+			`service:${event.scriptName || env.SERVICE_NAME}`,
 			`source:cloudflare-tail-worker`,
 			env.ENVIRONMENT ? `env:${env.ENVIRONMENT}` : 'env:dev'
 		].join(',');
 
-		// Create a log entry for the main event
-		const mainLog: DatadogLogEntry = {
-			timestamp: baseTimestamp,
-			status: event.outcome || 'unknown',
-			message: `Cloudflare Worker execution - ${event.outcome || 'completed'}`,
-			service: env.SERVICE_NAME,
-			ddsource: 'cloudflare',
-			ddtags: `${baseTags},log_type:main_event`,
-			hostname: 'cloudflare-worker',
-			event_type: 'cloudflare_trace',
-			worker_name: env.SERVICE_NAME,
-			script_name: event.scriptName || env.SERVICE_NAME,
-			cpu_time_ms: event.cpuTime,
-			wall_time_ms: event.wallTime,
-			entrypoint: event.entrypoint,
-			script_version: event.scriptVersion,
-			dispatch_namespace: event.dispatchNamespace
-		};
-
-		// Add event-specific fields based on event type
-		if (event.event && 'request' in event.event) {
-			// This is a fetch event
-			const fetchEvent = event.event as any;
-			mainLog.ray_id = fetchEvent.rayID;
-			mainLog.request_method = fetchEvent.request?.method;
-			mainLog.request_url = fetchEvent.request?.url;
-			mainLog.response_status = fetchEvent.response?.status;
-		}
-		datadogLogs.push(mainLog);
-
 		// Create separate log entries for each log in the Logs array
 		if (event.logs && Array.isArray(event.logs)) {
 			event.logs.forEach(logEntry => {
-				const logTimestamp = logEntry.timestamp || baseTimestamp;
 				const logMessage = Array.isArray(logEntry.message) 
 					? logEntry.message.join(' ') 
 					: String(logEntry.message || '');
 
 				const workerLog: DatadogLogEntry = {
-					timestamp: logTimestamp,
+					timestamp: logEntry.timestamp,
 					status: logEntry.level || 'info',
 					message: logMessage,
-					service: env.SERVICE_NAME,
-					ddsource: 'cloudflare',
-					ddtags: `${baseTags},log_type:worker_log,log_level:${logEntry.level || 'info'}`,
-					hostname: 'cloudflare-worker',
-					event_type: 'cloudflare_worker_log',
+					service: event.scriptName || env.SERVICE_NAME,
+					ddsource: 'cloudflare-tail-worker',
+					ddtags: `${baseTags}`,
+					hostname: event.scriptName || env.SERVICE_NAME,
 					worker_name: env.SERVICE_NAME,
 					script_name: event.scriptName || env.SERVICE_NAME,
 					log_level: logEntry.level,
-					parent_event_timestamp: baseTimestamp
 				};
-
-				// Add ray_id if this is a fetch event
-				if (event.event && 'request' in event.event) {
-					const fetchEvent = event.event as any;
-					workerLog.ray_id = fetchEvent.rayID;
-				}
 
 				datadogLogs.push(workerLog);
 			});
