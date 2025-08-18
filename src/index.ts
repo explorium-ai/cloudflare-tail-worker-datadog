@@ -2,7 +2,6 @@
 export interface Env {
 	/** Datadog API key for authentication */
 	DATADOG_API_KEY: string;
-
 	/** Service name for tagging logs */
 	SERVICE_NAME: string;
 	/** Environment name for tagging logs (e.g., production, staging) */
