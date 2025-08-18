@@ -110,7 +110,7 @@ export default {
 		try {
 			// Validate required environment variables
 			if (!env.DD_API_KEY) {
-				console.error('DATADOG_API_KEY is required');
+				console.error('DD_API_KEY is required');
 				return;
 			}
 			if (!env.SERVICE_NAME) {
