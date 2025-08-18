@@ -1,9 +1,9 @@
 
 export interface Env {
 	/** Datadog API key for authentication */
-	DATADOG_API_KEY: string;
+	DD_API_KEY: string;
 	/** Service name for tagging logs */
-	SERVICE_NAME: string;
+	SERVICE_NAME: "mcp-tail-worker";
 	/** Environment name for tagging logs (e.g., production, staging) */
 	ENVIRONMENT?: string;
 }
@@ -109,7 +109,7 @@ export default {
 	async tail(events: TraceItem[], env: Env): Promise<void> {
 		try {
 			// Validate required environment variables
-			if (!env.DATADOG_API_KEY) {
+			if (!env.DD_API_KEY) {
 				console.error('DATADOG_API_KEY is required');
 				return;
 			}
@@ -122,14 +122,14 @@ export default {
 			const datadogLogs = transformToDatadogLogs(events, env);
 			
 			// Datadog logs intake URL
-			const datadogUrl = `https://http-intake.logs.datadoghq.com/v1/input/${env.DATADOG_API_KEY}`;
+			const datadogUrl = `https://http-intake.logs.datadoghq.com/v1/input/${env.DD_API_KEY}`;
 
 			// Send logs to Datadog
 			const response = await fetch(datadogUrl, {
 				method: 'POST',
 				headers: {
 					'Content-Type': 'application/json',
-					'DD-API-KEY': env.DATADOG_API_KEY
+					'DD-API-KEY': env.DD_API_KEY
 				},
 				body: JSON.stringify(datadogLogs)
 			});
