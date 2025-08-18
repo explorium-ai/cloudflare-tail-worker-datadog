@@ -1,4 +1,3 @@
-
 export interface Env {
 	/** Datadog API key for authentication */
 	DD_API_KEY: string;
@@ -10,9 +9,6 @@ export interface Env {
 	DD_SITE?: string;
 }
 
-/**
- * Datadog log entry structure
- */
 interface DatadogLogEntry {
 	timestamp: number;
 	status: string;
@@ -25,10 +21,6 @@ interface DatadogLogEntry {
 	[key: string]: unknown;
 }
 
-/**
- * Transforms Cloudflare trace items into Datadog log format
- * Flattens the Logs array so each log entry becomes a separate Datadog log
- */
 function transformToDatadogLogs(events: TraceItem[], env: Env): DatadogLogEntry[] {
 	const datadogLogs: DatadogLogEntry[] = [];
 
@@ -56,7 +48,7 @@ function transformToDatadogLogs(events: TraceItem[], env: Env): DatadogLogEntry[
 					hostname: event.scriptName || env.SERVICE_NAME,
 					worker_name: env.SERVICE_NAME,
 					script_name: event.scriptName || env.SERVICE_NAME,
-					log_level: logEntry.level,
+					log_level: logEntry.level
 				};
 
 				datadogLogs.push(workerLog);
@@ -89,8 +81,6 @@ export default {
 			// Datadog logs intake URL (v2 API) - configurable by site
 			const datadogUrl = `https://http-intake.logs.${ddSite}/api/v2/logs`;
 
-
-			
 			// Send logs to Datadog
 			const response = await fetch(datadogUrl, {
 				method: 'POST',
