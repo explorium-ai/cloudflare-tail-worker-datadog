@@ -42,16 +42,7 @@ Update `wrangler.jsonc` with your specific values:
 }
 ```
 
-#### Datadog Sites
 
-Choose the appropriate `DATADOG_SITE` based on your Datadog account:
-
-- `datadoghq.com` (US1 - default)
-- `datadoghq.eu` (EU)
-- `us3.datadoghq.com` (US3)
-- `us5.datadoghq.com` (US5)
-- `ap1.datadoghq.com` (AP1)
-- `ddog-gov.com` (Gov)
 
 ### 4. Deploy
 
@@ -72,10 +63,8 @@ service = "mcp-tail-worker"
 
 | Variable | Required | Description | Example |
 |----------|----------|-------------|---------|
-| `DATADOG_API_KEY` | ✅ | Your Datadog API key (secret) | `abc123...` |
+| `DD_API_KEY` | ✅ | Your Datadog API key (secret) | `abc123...` |
 | `SERVICE_NAME` | ✅ | Service name for tagging | `my-api-service` |
-| `DATADOG_APP_KEY` | ❌ | Datadog Application key (secret) | `def456...` |
-| `DATADOG_SITE` | ❌ | Datadog site endpoint | `datadoghq.com` |
 | `ENVIRONMENT` | ❌ | Environment tag | `production` |
 
 ## Log Structure
@@ -130,13 +119,12 @@ Once deployed, you can monitor your logs in Datadog by:
 ### Common Issues
 
 1. **No logs appearing in Datadog**
-   - Verify your `DATADOG_API_KEY` is correct
-   - Check the `DATADOG_SITE` matches your Datadog account region
+   - Verify your `DD_API_KEY` is correct
    - Ensure the tail consumer is properly configured
 
 2. **Authentication errors**
    - Double-check your API key has the correct permissions
-   - Verify the Datadog site endpoint is correct
+   - Verify you're using the correct Datadog API endpoint
 
 3. **Missing trace events**
    - Ensure your source workers are generating trace events
