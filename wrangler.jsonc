@@ -4,7 +4,7 @@
  */
 {
 	"$schema": "node_modules/wrangler/config-schema.json",
-	"name": "mcp-tail-worker",
+	"name": "cloudflare-tail-worker-datadog",
 	"main": "src/index.ts",
 	"compatibility_date": "2025-08-16",
 	"observability": {
@@ -26,7 +26,7 @@
 	 * https://developers.cloudflare.com/workers/wrangler/configuration/#environment-variables
 	 */
 	"vars": {
-		"SERVICE_NAME": "mcp-tail-worker",
+		"SERVICE_NAME": "cloudflare-tail-worker-datadog",
 		"ENVIRONMENT": "production",
 		"DD_SITE": "datadoghq.com"
 	}

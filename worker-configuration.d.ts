@@ -3,7 +3,7 @@
 // Runtime types generated with workerd@1.20250709.0 2025-08-16 
 declare namespace Cloudflare {
 	interface Env {
-		SERVICE_NAME: "mcp-tail-worker";
+		SERVICE_NAME: "cloudflare-tail-worker-datadog";
 		ENVIRONMENT: "production";
 	}
 }

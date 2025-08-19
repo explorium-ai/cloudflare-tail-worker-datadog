@@ -12,8 +12,8 @@ Send your Cloudflare Worker logs to Datadog in real-time. This tail worker trans
 
 1. **Clone and install**
    ```bash
-   git clone https://github.com/your-username/mcp-tail-worker.git
-   cd mcp-tail-worker
+   git clone https://github.com/explorium-ai/cloudflare-tail-worker-datadog.git
+   cd cloudflare-tail-worker-datadog
    npm install
    ```
 
@@ -41,7 +41,7 @@ Send your Cloudflare Worker logs to Datadog in real-time. This tail worker trans
 5. **Connect your workers** - add to their `wrangler.toml`:
    ```toml
    [[tail_consumers]]
-   service = "mcp-tail-worker"
+   service = "cloudflare-tail-worker-datadog"
    ```
 
 Done! Your logs now flow to Datadog in real-time.
@@ -95,7 +95,7 @@ log_level:error OR log_level:warn
 
 **Debug your tail worker:**
 ```bash
-wrangler tail mcp-tail-worker  # Watch live logs
+wrangler tail cloudflare-tail-worker-datadog  # Watch live logs
 wrangler list                  # Check deployment
 ```
 
