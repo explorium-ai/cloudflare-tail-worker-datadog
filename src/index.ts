@@ -2,7 +2,7 @@ export interface Env {
 	/** Datadog API key for authentication */
 	DD_API_KEY: string;
 	/** Service name for tagging logs */
-	SERVICE_NAME: "mcp-tail-worker";
+	SERVICE_NAME: string;
 	/** Environment name for tagging logs (e.g., production, staging) */
 	ENVIRONMENT?: string;
 	/** Datadog site (e.g., datadoghq.com, datadoghq.eu, us3.datadoghq.com) */
@@ -34,8 +34,8 @@ function transformToDatadogLogs(events: TraceItem[], env: Env): DatadogLogEntry[
 		// Create separate log entries for each log in the Logs array
 		if (event.logs && Array.isArray(event.logs)) {
 			event.logs.forEach(logEntry => {
-				const logMessage = Array.isArray(logEntry.message) 
-					? logEntry.message.join(' ') 
+				const logMessage = Array.isArray(logEntry.message)
+					? logEntry.message.join(' ')
 					: String(logEntry.message || '');
 
 				const workerLog: DatadogLogEntry = {
@@ -72,13 +72,8 @@ export default {
 				return;
 			}
 
-			// Transform events to Datadog format
 			const datadogLogs = transformToDatadogLogs(events, env);
-			
-		    // Determine Datadog site - default to US1 (datadoghq.com)
 			const ddSite = env.DD_SITE || 'datadoghq.com';
-			
-			// Datadog logs intake URL (v2 API) - configurable by site
 			const datadogUrl = `https://http-intake.logs.${ddSite}/api/v2/logs`;
 
 			// Send logs to Datadog

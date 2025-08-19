@@ -1,141 +1,102 @@
-# Datadog Cloudflare Tail Worker
+# Cloudflare to Datadog Tail Worker
 
-A Cloudflare Worker that receives tail events from other Cloudflare Workers and forwards them to Datadog for monitoring and logging.
+Send your Cloudflare Worker logs to Datadog in real-time. This tail worker transforms and forwards logs with custom tags and structured format.
 
-## Features
+## Why This?
 
-- ✅ Real-time log forwarding to Datadog
-- ✅ Configurable Datadog sites (US, EU, etc.)
-- ✅ Structured logging with proper tagging
-- ✅ Error handling and validation
-- ✅ TypeScript support
-- ✅ Environment-based configuration
+- **Datadog SDK doesn't work** in Cloudflare Workers (Node.js dependencies)
+- **Logpush is bulky** - sends huge batches instead of individual logs
+- **Need real-time logs** with custom enrichment and tagging
 
-## Setup
+## Quick Start
 
-### 1. Install Dependencies
+1. **Clone and install**
+   ```bash
+   git clone https://github.com/your-username/mcp-tail-worker.git
+   cd mcp-tail-worker
+   npm install
+   ```
 
-```bash
-npm install
-```
+2. **Set your Datadog API key**
+   ```bash
+   wrangler secret put DD_API_KEY
+   ```
 
-### 2. Configure Environment Variables
+3. **Configure environment** in `wrangler.jsonc`:
+   ```json
+   {
+     "vars": {
+       "SERVICE_NAME": "your-service-name",
+       "ENVIRONMENT": "production",
+       "DD_SITE": "datadoghq.com"
+     }
+   }
+   ```
 
-Set up the following secrets using Wrangler:
+4. **Deploy**
+   ```bash
+   npm run deploy
+   ```
 
-```bash
-# Required: Your Datadog API key
-wrangler secret put DD_API_KEY
-```
+5. **Connect your workers** - add to their `wrangler.toml`:
+   ```toml
+   [[tail_consumers]]
+   service = "mcp-tail-worker"
+   ```
 
-### 3. Configure Environment Variables
+Done! Your logs now flow to Datadog in real-time.
 
-Update `wrangler.jsonc` with your specific values:
-
-```json
-{
-  "vars": {
-    "SERVICE_NAME": "your-service-name",
-    "ENVIRONMENT": "production",
-    "DATADOG_SITE": "datadoghq.com"
-  }
-}
-```
-
-
-
-### 4. Deploy
-
-```bash
-npm run deploy
-```
-
-### 5. Configure Tail Workers
-
-Set up your other Cloudflare Workers to send tail events to this worker. Add the following to your main worker's `wrangler.toml`:
-
-```toml
-[[tail_consumers]]
-service = "mcp-tail-worker"
-```
-
-## Environment Variables
+## Configuration
 
 | Variable | Required | Description | Example |
 |----------|----------|-------------|---------|
-| `DD_API_KEY` | ✅ | Your Datadog API key (secret) | `abc123...` |
+| `DD_API_KEY` | ✅ | Your Datadog API key | `abc123...` |
 | `SERVICE_NAME` | ✅ | Service name for tagging | `my-api-service` |
-| `ENVIRONMENT` | ❌ | Environment tag | `production` |
+| `ENVIRONMENT` | ❌ | Environment tag (defaults to `dev`) | `production` |
+| `DD_SITE` | ❌ | Datadog site (defaults to `datadoghq.com`) | `datadoghq.eu` |
 
-## Log Structure
+## How It Works
 
-The worker transforms Cloudflare trace events into structured Datadog logs with the following format:
-
-```json
-{
-  "timestamp": 1640995200000,
-  "status": "ok",
-  "message": "Cloudflare Worker execution - ok",
-  "service": "my-service",
-  "ddsource": "cloudflare",
-  "ddtags": "service:my-service,source:cloudflare-worker,env:production",
-  "hostname": "cloudflare-worker",
-  "event_type": "cloudflare_trace",
-  "worker_name": "my-service",
-  "script_name": "my-service"
-}
-```
+1. Receives tail events from your Workers in real-time
+2. Transforms logs into structured format with tags
+3. Sends to Datadog via HTTP API
+4. Adds metadata: service name, environment, timestamps
 
 ## Development
 
-### Run Tests
-
 ```bash
-npm test
+npm test          # Run tests
+npm run dev       # Local development  
+npm run cf-typegen # Generate types
 ```
 
-### Local Development
+## Viewing Logs in Datadog
 
-```bash
-npm run dev
+Your logs appear in Datadog with structured tags:
+
+**Find your logs:**
+- Filter by `source:cloudflare-tail-worker` 
+- Use tags like `service:your-service-name` or `env:production`
+
+**Example queries:**
 ```
-
-### Type Generation
-
-```bash
-npm run cf-typegen
+source:cloudflare-tail-worker AND status:error
+service:my-api AND env:production  
+log_level:error OR log_level:warn
 ```
-
-## Monitoring
-
-Once deployed, you can monitor your logs in Datadog by:
-
-1. Going to the Logs section in Datadog
-2. Filtering by source: `cloudflare`
-3. Using tags like `service:your-service-name` or `env:production`
 
 ## Troubleshooting
 
-### Common Issues
+**No logs appearing?**
+- Check API key exists: `wrangler secret list`
+- Verify `[[tail_consumers]]` in your worker's `wrangler.toml`
+- Ensure your workers are actually logging (`console.log`)
+- Confirm correct `DD_SITE` for your region
 
-1. **No logs appearing in Datadog**
-   - Verify your `DD_API_KEY` is correct
-   - Ensure the tail consumer is properly configured
-
-2. **Authentication errors**
-   - Double-check your API key has the correct permissions
-   - Verify you're using the correct Datadog API endpoint
-
-3. **Missing trace events**
-   - Ensure your source workers are generating trace events
-   - Check that the tail consumer binding is properly set up
-
-### Debugging
-
-Enable debug logging by checking the Cloudflare Workers logs:
-
+**Debug your tail worker:**
 ```bash
-wrangler tail
+wrangler tail mcp-tail-worker  # Watch live logs
+wrangler list                  # Check deployment
 ```
 
 ## License
